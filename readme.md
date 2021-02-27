@@ -9,7 +9,7 @@
 1. npm i
 2. copy the factoryAddress from kingkong-swap-core deploy print, into scripts/deploy.js
 3. npx hardhat run scripts/deploy.js --network localhost
-### now you have router deployed
-### local.js can test swap, good luck!
-### if you need farm, next step turn to kingkong-farm
+- now you have router deployed
+- local.js can test swap, good luck!
+- if you need farm, next step turn to kingkong-farm
 
