@@ -32,6 +32,17 @@ async function main() {
 	// INIT_CODE_PAIR_HASH: 0x78f09162e93227e9b60ba10199ebab3d099ac00ebac04f9e1a23ddc35d7f6c21
 }
 
+async function deployERC() {
+    let totalSupply = BigNumber.from('100000000000000000000000000') //1个亿
+    let leeAddress = '0x662546Dcc9f158a9ABb4d1c3B369B07bC67969D6'
+    const ERC20 = await hre.ethers.getContractFactory('ERC20')
+
+    let token = await ERC20.deploy('USDT', totalSupply)
+    await token.deployed()
+    console.log('USDT deployed to:', token.address)
+    await token.transfer(leeAddress, totalSupply.div(2))
+}
+
 main()
 	.then(() => process.exit(0))
 	.catch(error => {
