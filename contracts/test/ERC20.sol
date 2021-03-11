@@ -7,7 +7,7 @@ contract ERC20 {
 
     string public constant name = 'Test Token';
     string public symbol;
-    uint8 public constant decimals = 18;
+    uint8 public decimals;
     uint  public totalSupply;
     mapping(address => uint) public balanceOf;
     mapping(address => mapping(address => uint)) public allowance;
@@ -20,7 +20,7 @@ contract ERC20 {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
-    constructor(string memory _symbol, uint _totalSupply) public {
+    constructor(string memory _symbol, uint _totalSupply, uint8 _decimals) public {
         uint chainId;
         assembly {
             chainId := chainid()
@@ -35,6 +35,7 @@ contract ERC20 {
             )
         );
         symbol = _symbol;
+        decimals = _decimals;
         _mint(msg.sender, _totalSupply);
     }
 
