@@ -9,29 +9,15 @@ async function main() {
 	// await weth.deployed()
 	// console.log('WETH deployed to:', weth.address)
 
-	const woktAddress = '0x2219845942d28716c0f7c605765fabdca1a7d9e0' //okex_testnet
+	// const woktAddress = '0x2219845942d28716c0f7c605765fabdca1a7d9e0' //okex_testnet
+	const woktAddress = '0x70c1c53E991F31981d592C2d865383AC0d212225' //okex_testnet
+    console.log('woktAddress:', woktAddress)
 
 	const Router = await hre.ethers.getContractFactory('UniswapV2Router02')
-	const factoryAddress = '0xDcAA842dC9515CA4d2bB939d8AF96DD1e8607482'
+	const factoryAddress = '0x38D509C14aC8a321CbC162DfA6A23f27f301c444'
 	const router = await Router.deploy(factoryAddress, woktAddress)
 	await router.deployed()
 	console.log('Router deployed to:', router.address)
-
-	//localhost
-	// Factory deployed to: 0x0b27a79cb9C0B38eE06Ca3d94DAA68e0Ed17F953
-	// WETH deployed to: 0x7bdd3b028C4796eF0EAf07d11394d0d9d8c24139
-	// Router deployed to: 0xB468647B04bF657C9ee2de65252037d781eABafD
-
-	//okex_testnet
-	// Factory deployed to: 0x69268B5859E0E1081254ECe7399449685235047d
-	// WOKT deployed to: 0x2219845942d28716c0f7c605765fabdca1a7d9e0
-	// Router deployed to: 0x1aDd5CF43EF5E50cA91784715cEfdd03B5ee59Bb
-	
-	//bsc_testnet
-	// Factory deployed to: 0x7B6a4fe1cBe55049CbDa9719E60AeE7471A5f02F
-	// WETH deployed to: 0xC20DA87779aC7C9ff764667f6B81c46A0a0131E0
-	// Router deployed to: 0x996E6d5042Ea9708E85a1D7E59Bb434BFb999bD2
-	// INIT_CODE_PAIR_HASH: 0x78f09162e93227e9b60ba10199ebab3d099ac00ebac04f9e1a23ddc35d7f6c21
 }
 
 
