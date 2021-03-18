@@ -2,26 +2,93 @@ const hre = require('hardhat')
 const fs = require('fs')
 const { BigNumber } = require('ethers')
 
-const factoryAddress = '0x69268B5859E0E1081254ECe7399449685235047d'
-const routerAddress = '0x1aDd5CF43EF5E50cA91784715cEfdd03B5ee59Bb'
-const OKB = '0xda9d14072ef2262c64240da3a93fea2279253611' //官方
+// swap
+// Factory deployed to: 0x38D509C14aC8a321CbC162DfA6A23f27f301c444
+// INIT_CODE_PAIR_HASH: 0x3d8e383832ed8a82a2668fee8b3352451d825041d1bdf9ad476a5d1a3a6d98e2
+// factory.setFeeTo 0x50D8aD8e7CC0C9c2236Aac2D2c5141C164168da3 //收0.3%手续费的账号
+// woktAddress: 0x70c1c53E991F31981d592C2d865383AC0d212225
+// Router deployed to: 0x37239DD3A8FF6dd7B125Ec8738069733340bD30F
+
+// farm
+// KKT deployed to: 0x4962Bf3133dFb5630e3fEd6bb55AC35731BCa3fF
+// MasterChef deployed to: 0xe5Fa42c0dEA555C65c479dd4b29CA91BE9374694
+// MasterChef owner is: 0xE44081Ee2D0D4cbaCd10b44e769A14Def065eD4D //管理池子、修改挖矿产出
+// MasterChef dev is: 0x50D8aD8e7CC0C9c2236Aac2D2c5141C164168da3 //接收KKT10%的产出
+// MasterChef ope is: 0x011EBb673b8e7e042C42121CCA062FB7b27BdCFE //接收KKT5%的产出
+// Deployer deployed to: 0x0c15c2132381577EfA26C0f0db468d30d1Dcb088 //用来创建KingChef
+// createChef address: 0x93783AB91fE66B7D731dF3C15403E0fB102B9597 //创建的KingChef
+
+// 官方测试网发行OIP20代币，10位精度
+// OKB 0xDa9d14072Ef2262c64240Da3A93fea2279253611
+// USDT 0xe579156f9dEcc4134B5E3A30a24Ac46BB8B01281
+// USDK 0x533367b864D9b9AA59D0DCB6554DF0C89feEF1fF
+// USDC 0x3e33590013B24bf21D4cCca3a965eA10e570D5B2
+// BTCK 0x09973e7e3914EB5BA69C7c025F30ab9446e3e4e0
+// ETHK 0xDF950cEcF33E64176ada5dD733E170a56d11478E
+// DOTK 0x72f8fa5da80dc6e20e00d02724cf05ebd302c35f
+// FILK 0xf6a0Dc1fD1d2c0122ab075d7ef93aD79F02CcB93
+// LTCK 0xd616388f6533B6f1c31968a305FbEE1727F55850
+// WOKT 0x70c1c53E991F31981d592C2d865383AC0d212225
+
+const factoryAddress = '0x38D509C14aC8a321CbC162DfA6A23f27f301c444'
+const routerAddress = '0x37239DD3A8FF6dd7B125Ec8738069733340bD30F'
+
+const OKB = '0xda9d14072ef2262c64240da3a93fea2279253611'
 const NAS = '0x6FD9dB63dbC6BE452ae7B0Fe9995c81d967870Bb'
-const DAI = '0x0586e702605d7206edD283D4311B38AEB579d7BC'
-const USDT = '0xe579156f9decc4134b5e3a30a24ac46bb8b01281' //官方
-const KKT = '0x4888097d1B29b439C55C6d3E44031eE658237dE3'
+const USDT = '0xe579156f9decc4134b5e3a30a24ac46bb8b01281'
+const USDK = '0x533367b864D9b9AA59D0DCB6554DF0C89feEF1fF'
+const USDC = '0x3e33590013B24bf21D4cCca3a965eA10e570D5B2'
+const BTCK = '0x09973e7e3914EB5BA69C7c025F30ab9446e3e4e0'
+const ETHK = '0xDF950cEcF33E64176ada5dD733E170a56d11478E'
+const DOTK = '0x72f8fa5da80dc6e20e00d02724cf05ebd302c35f'
+const FILK = '0xf6a0Dc1fD1d2c0122ab075d7ef93aD79F02CcB93'
+const LTCK = '0xd616388f6533B6f1c31968a305FbEE1727F55850'
+const WOKT = '0x70c1c53E991F31981d592C2d865383AC0d212225'
+const KKT = '0x4962Bf3133dFb5630e3fEd6bb55AC35731BCa3fF'
 
 async function main() {
     var accounts = await hre.ethers.getSigners()
 
-    await addLiquidity(KKT, USDT, 18, 10) //pair 0xc23F883d711846DEd91c4ABC6B6ceC004bE2c77c
-    await delay(15)
-    await addLiquidity(NAS, USDT, 18, 10)  //pair 0x240324f119a8159c9AA6ED107BA7244213524768
-    await delay(15)
-    await addLiquidityETH(KKT, 18) //pair 0xE63d2bc2945689126C514A8497b0c04E5C9f8446
-    await delay(15)
-    await addLiquidityETH(USDT, 10) //pair 0xfeE7E19eDC2D945103e64827cf4A81Ce649d9079
-    await delay(15)
-    await addLiquidityETH(OKB, 10) //pair 0x5c71B198c53E4FF06F2bcE6DeE283b28C014F9b2
+    // LP 挖矿
+    // KKT-USDT 5
+    // KKT-OKT 5
+    // OKT-USDT 3
+    // NAS-USDT 3
+    // OKB-USDT 2
+    // BTCK-USDT 1
+    // ETHK-USDT 1
+    // LTCK-USDT 1
+    // DOTK-USDT 1
+    // FILK-USDT 1
+    // USDK-USDT 1
+
+    // 单币挖矿 launchPool
+    // KKT -> KKT, OKT
+    // OKT -> KKT
+    // NAS -> KKT
+
+    await addLiquidity(KKT, USDT, 18, 10) //pair 
+    await delay(10)
+    await addLiquidityETH(KKT, 18) //pair 
+    await delay(10)
+    await addLiquidityETH(USDT, 10) //pair 
+    await delay(10)
+    await addLiquidity(NAS, USDT, 18, 10)  //pair 
+    await delay(10)
+    await addLiquidity(OKB, USDT, 10, 10)  //pair 
+    await delay(10)
+    await addLiquidity(BTCK, USDT, 10, 10)  //pair 
+    await delay(10)
+    await addLiquidity(ETHK, USDT, 10, 10)  //pair 
+    await delay(10)
+    await addLiquidity(LTCK, USDT, 10, 10)  //pair 
+    await delay(10)
+    await addLiquidity(DOTK, USDT, 10, 10)  //pair 
+    await delay(10)
+    await addLiquidity(FILK, USDT, 10, 10)  //pair 
+    await delay(10)
+    await addLiquidity(USDK, USDT, 10, 10)  //pair 
+    await delay(10)
 
     console.log('done')
 }
@@ -41,20 +108,15 @@ async function addLiquidity(tokenAAddress, tokenBAddress, decimalsA, decimalsB) 
     let block = await hre.ethers.provider.getBlock(blockNumber)
     let deadline = BigNumber.from(block.timestamp + 3600 * 24)
 
-    let balanceA = dpow(await tokenA.balanceOf(accounts[0].address), decimalsA)
-    let balanceB = dpow(await tokenB.balanceOf(accounts[0].address), decimalsB)
-    console.log('tokenA account0 balance', balanceA)
-    console.log('tokenB account0 balance', balanceB)
+    // let balanceA = dpow(await tokenA.balanceOf(accounts[0].address), decimalsA)
+    // let balanceB = dpow(await tokenB.balanceOf(accounts[0].address), decimalsB)
+    // console.log('tokenA account0 balance', await tokenA.symbol(), balanceA)
+    // console.log('tokenB account0 balance', await tokenB.symbol(), balanceB)
 
     await tokenA.approve(routerAddress, pow(1, decimalsA))
     await tokenB.approve(routerAddress, pow(1, decimalsB))
-    console.log('approve')
-    await delay(15)
-
-    // let allowance = await tokenA.allowance(accounts[0].address, routerAddress)
-    // console.log('allowance a', dpow(allowance, decimalsA))
-    // allowance = await tokenB.allowance(accounts[0].address, routerAddress)
-    // console.log('allowance b', dpow(allowance, decimalsB))
+    // console.log('approve')
+    await delay(10)
 
     await router.addLiquidity(tokenAAddress, tokenBAddress, pow(1, decimalsA), pow(1, decimalsB), pow(0, decimalsA), pow(0, decimalsB)
         , accounts[0].address, deadline, { gasLimit: BigNumber.from('8000000') })
@@ -72,13 +134,16 @@ async function addLiquidityETH(tokenAddress, decimals) {
     let ERC20abi = getAbi('./artifacts/contracts/test/ERC20.sol/ERC20.json')
     const token = new ethers.Contract(tokenAddress, ERC20abi, accounts[0])
 
+    // let balance = dpow(await token.balanceOf(accounts[0].address), decimals)
+    // console.log('token account0 balance', await token.symbol(), balance)
+
     let blockNumber = await hre.ethers.provider.getBlockNumber()
     let block = await hre.ethers.provider.getBlock(blockNumber)
     let deadline = BigNumber.from(block.timestamp + 3600 * 24)
 
     await token.approve(routerAddress, pow(1, decimals))
-    console.log('approve')
-    await delay(15)
+    // console.log('approve')
+    await delay(10)
     await router.addLiquidityETH(tokenAddress, pow(1, decimals), pow(0, decimals), pow(0, 18)
         , accounts[0].address, deadline, { value: pow(1, 18), gasLimit: BigNumber.from('8000000') })
 
@@ -101,9 +166,24 @@ async function viewPairs() {
 
         let pairAbi = getAbi('artifacts/@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol/IUniswapV2Pair.json')
         let pair = new ethers.Contract(pairAddress, pairAbi, accounts[0])
-        console.log('pair address:', pairAddress)
-    }
 
+        let ercAbi = getAbi('./artifacts/contracts/test/ERC20.sol/ERC20.json')
+
+        if (await pair.symbol() == 'KK-LP') {
+            let token0Address = await pair.token0()
+            let erc0 = new ethers.Contract(token0Address, ercAbi, accounts[0])
+    
+            let token1Address = await pair.token1()
+            let erc1 = new ethers.Contract(token1Address, ercAbi, accounts[0])
+    
+            console.log('lptoken:', pair.address, await erc0.symbol() + '-' + await erc1.symbol())
+            
+        } else {
+            
+            console.log('token:', pair.address, await pair.symbol())
+
+        }
+    }
 }
 
 
@@ -117,7 +197,6 @@ function getAbi(jsonPath) {
 function pow(num, decimals) {
     return BigNumber.from(10).pow(decimals).mul(num)
 }
-
 
 function dpow(bn, decimals) {
     return bn.div(BigNumber.from(10).pow(decimals)).toString()
@@ -135,7 +214,8 @@ async function delay(sec) {
 }
 
 
-viewPairs()
+main().then(viewPairs)
+// viewPairs()
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error)
