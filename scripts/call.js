@@ -30,8 +30,8 @@ const { BigNumber } = require('ethers')
 // LTCK 0xd616388f6533B6f1c31968a305FbEE1727F55850
 // WOKT 0x70c1c53E991F31981d592C2d865383AC0d212225
 
-const factoryAddress = '0x38D509C14aC8a321CbC162DfA6A23f27f301c444'
-const routerAddress = '0x37239DD3A8FF6dd7B125Ec8738069733340bD30F'
+const factoryAddress = '0xDcAA842dC9515CA4d2bB939d8AF96DD1e8607482'
+const routerAddress = '0xD9Ee582C00E2f6b0a5A0F4c18c88a30e49C0304b'
 
 const OKB = '0xda9d14072ef2262c64240da3a93fea2279253611'
 const NAS = '0x6FD9dB63dbC6BE452ae7B0Fe9995c81d967870Bb'
@@ -44,7 +44,7 @@ const DOTK = '0x72f8fa5da80dc6e20e00d02724cf05ebd302c35f'
 const FILK = '0xf6a0Dc1fD1d2c0122ab075d7ef93aD79F02CcB93'
 const LTCK = '0xd616388f6533B6f1c31968a305FbEE1727F55850'
 const WOKT = '0x70c1c53E991F31981d592C2d865383AC0d212225'
-const KKT = '0x4962Bf3133dFb5630e3fEd6bb55AC35731BCa3fF'
+const KKT = '0x4C8ef89f82E8A773F6B943200fe56d36DDBaF324'
 
 async function main() {
     var accounts = await hre.ethers.getSigners()
@@ -176,7 +176,7 @@ async function viewPairs() {
             let token1Address = await pair.token1()
             let erc1 = new ethers.Contract(token1Address, ercAbi, accounts[0])
     
-            console.log('lptoken:', pair.address, await erc0.symbol() + '-' + await erc1.symbol())
+            console.log('lptoken:', pair.address, await erc0.symbol() + '-' + await erc1.symbol(), 'token0:', token0Address, 'token1', token1Address)
             
         } else {
             
@@ -214,8 +214,8 @@ async function delay(sec) {
 }
 
 
-main().then(viewPairs)
-// viewPairs()
+// main().then(viewPairs)
+viewPairs()
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error)
