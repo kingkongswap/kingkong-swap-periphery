@@ -33,7 +33,8 @@ module.exports = {
 			]
 		},
 		kk_testnet: {
-			url: 'http://39.103.147.63:26659',
+			// url: 'http://39.103.147.63:26659',
+			url: 'https://test-node.kkt.one',
 			chainId: 65,
 			from: process.env.ETH_ADDRESS_0,
 			accounts: [
